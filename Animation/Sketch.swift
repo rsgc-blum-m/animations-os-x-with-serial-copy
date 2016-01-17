@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Darwin
 
 // NOTE: The Sketch class will define the methods required by the ORSSerialPortDelegate protocol
 //
@@ -28,8 +29,9 @@ class Sketch : NSObject, ORSSerialPortDelegate {
     var serialBuffer : String = ""
     var x = 0   // Horizontal position for the circle appearing on screen
     var y = 0   // Vertical position for the circle appearing on screen
-    var s = 1
-    var r = 300
+    var r = 300 // Radius
+    var s = 1 // Horizontal position changer
+    var width = 250
     
 
     // This runs once, equivalent to setup() in Processing
@@ -68,21 +70,15 @@ class Sketch : NSObject, ORSSerialPortDelegate {
             
         }
         
+        
+        
     }
     
     // Runs repeatedly, equivalent to draw() in Processing
     func draw() {
-                
-        // Horizontal position of circle
-        x = x + s
-        
-        // Bounce when hitting wall
-        if (x > canvas.width || x < 0) {
-            s *= -1
-        }
         
         canvas.drawShapesWithBorders = false
-        canvas.fillColor = Color(hue: 0, saturation: 0, brightness: 0, alpha: 0)
+        canvas.fillColor = Color(hue: 0, saturation: 0, brightness: 100, alpha: 90)
         canvas.drawRectangle(bottomRightX: 0, bottomRightY: 0, width: canvas.width, height: canvas.height)
         
         //Larger Trapezoid
@@ -108,9 +104,18 @@ class Sketch : NSObject, ORSSerialPortDelegate {
         canvas.drawLine(fromX: canvas.width - 50, fromY: 50, toX: canvas.width-73, toY: 208)
         canvas.drawLine(fromX: canvas.width - 75, fromY: 208, toX: 75  , toY: 208)
         
-        canvas.drawLine(fromX: canvas.width/2, fromY: 208, toX: "some trig"  , toY: "some trig")
+        width = width + s*20
+    
+        if (width > canvas.width/2 + x || width < canvas.width/2 - x) {
+            s *= -1
+        }
         
-                
+        let arccos = acos(Float((width-canvas.width/2)/r))
+    
+        let y = Float(r)*sin(arccos)
+        
+        canvas.drawLine(fromX: canvas.width/2, fromY: 208, toX:  width  , toY: Int(y) + 208)
+        
     }
     
     // ORSSerialPortDelegate
@@ -129,7 +134,7 @@ class Sketch : NSObject, ORSSerialPortDelegate {
                     
                     // Entire value sent from Arduino board received, assign to
                     // variable that controls the vertical position of the circle on screen
-                    y = Int(serialBuffer)!
+                    x = Int(serialBuffer)!
                     
                     // Reset the string that is the buffer for data received from serial port
                     serialBuffer = ""
