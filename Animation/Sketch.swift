@@ -106,14 +106,15 @@ class Sketch : NSObject, ORSSerialPortDelegate {
         
         width = width + s*20
     
-        if (width > canvas.width/2 + x || width < canvas.width/2 - x) {
+        if (width >= canvas.width/2 + x || width <= canvas.width/2 - x) {
             s *= -1
+            canvas.fillColor = Color(hue: 135, saturation: 100, brightness: 100, alpha: 100)
+            canvas.drawRectangle(bottomRightX: 25, bottomRightY: 550, width: 50, height: 50, borderWidth: 10)
         }
         
-        let arccos = acos(Float((width-canvas.width/2)/r))
+        var arccos = acos(Float((width-(canvas.width/2))/r))
+        var y = Float(r)*sin(arccos*Float(180/M_PI))
     
-        let y = Float(r)*sin(arccos)
-        
         canvas.drawLine(fromX: canvas.width/2, fromY: 208, toX:  width  , toY: Int(y) + 208)
         
     }
